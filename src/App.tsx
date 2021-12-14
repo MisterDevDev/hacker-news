@@ -1,27 +1,32 @@
 import React, { useState, useEffect } from "react";
 import Story from "./components/Story";
-import { QueryDetails } from "../types/component";
+import { StoryDetails } from "../types/component";
 import Pagination from "./components/Pagination";
 import axios from "axios";
 
 const App: React.FC = () => {
-  const [storyIds, setStoryIds] = useState([]);
+  const [top100Stories, setTop100Stories] = useState([]);
   const [currentStories, setCurrentStories] = useState([]);
   const [loading, setLoading] = useState(false);
   const [storiesPerPage] = useState(10);
 
-  const fetchDetails = async (stories: number[]) => {
-    setCurrentStories((await axios.post("/api/details", stories)).data);
+  //fetches top 500 story details, puts them in order by score, and saves the top 100 stories
+  const fetchStories = async (stories: number[]) => {
+    const top500Stories = (await axios.post("/api/details", stories)).data.sort(
+      (a: StoryDetails, b: StoryDetails) => {
+        return b.score - a.score;
+      }
+    );
+    setTop100Stories(top500Stories.slice(0, 100));
+    setCurrentStories(top500Stories.slice(0, 10));
+    setLoading(true);
   };
 
+  //gets ids for top 500 stories
   useEffect(() => {
-    const fetchStories = async () => {
-      const allStories = (await axios.get("/api//stories")).data.slice(0, 100);
-      setStoryIds(allStories);
-      fetchDetails(allStories.slice(0, 10));
-      setLoading(true);
-    };
-    fetchStories();
+    (async () => {
+      fetchStories((await axios.get("/api//stories")).data);
+    })();
   }, []);
 
   useEffect(() => {
@@ -31,8 +36,7 @@ const App: React.FC = () => {
   const paginate = (pageNumber: number): void => {
     const indexOfLastStory = pageNumber * storiesPerPage;
     const indexOfFirstStory = indexOfLastStory - storiesPerPage;
-    const displayStories = storyIds.slice(indexOfFirstStory, indexOfLastStory);
-    fetchDetails(displayStories);
+    setCurrentStories(top100Stories.slice(indexOfFirstStory, indexOfLastStory));
   };
 
   return (
@@ -48,12 +52,12 @@ const App: React.FC = () => {
         )}
       </div>
       <div>
-        {currentStories.map((story: QueryDetails) => {
+        {currentStories.map((story: StoryDetails) => {
           return <Story key={story.id} details={story} />;
         })}
         <Pagination
           storiesPerPage={storiesPerPage}
-          totalStories={storyIds.length}
+          totalStories={top100Stories.length}
           paginate={paginate}
         />
       </div>

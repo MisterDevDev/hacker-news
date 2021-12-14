@@ -1,8 +1,12 @@
 import React, { useState } from "react";
-import { queryProps, dateFormatter } from "../../types/component";
+import { CommentDetails, dateFormatter } from "../../types/component";
 import CommentSection from "./CommentSection";
 
-const Comment: React.FC<queryProps> = ({ details }) => {
+interface comment {
+  details: CommentDetails;
+}
+
+const Comment: React.FC<comment> = ({ details }) => {
   const [moreComments, toggleMoreComments] = useState(false);
   const { text, time, by, kids } = details;
 

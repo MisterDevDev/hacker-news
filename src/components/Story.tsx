@@ -1,8 +1,12 @@
 import React, { useState } from "react";
-import { queryProps, dateFormatter } from "../../types/component";
+import { StoryDetails, dateFormatter } from "../../types/component";
 import CommentSection from "./CommentSection";
 
-const Story: React.FC<queryProps> = ({ details }) => {
+interface story {
+  details: StoryDetails;
+}
+
+const Story: React.FC<story> = ({ details }) => {
   const [showComments, setComments] = useState(false);
 
   const toggleComments = () => {

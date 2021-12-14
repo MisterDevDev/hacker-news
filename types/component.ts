@@ -1,25 +1,25 @@
-export type QueryDetails = {
+export type StoryDetails = {
   id: number;
   by: string;
   time: number;
-  title?: string;
-  text?: string;
   url: string;
+  title: string;
+  score: number;
   kids?: number[];
 };
 
-export interface queryProps {
-  details: QueryDetails;
+export type CommentDetails = {
+  id: number;
+  by: string;
+  time: number;
+  text: string;
+  kids?: number[];
 }
 
 export interface paginationProps {
   storiesPerPage: number;
   totalStories: number;
   paginate: (pageNumber: number) => void;
-}
-
-export interface commentSectionProps {
-  kids?: number[];
 }
 
 export const dateFormatter = function (seconds: number): string {
